@@ -1,0 +1,17 @@
+FROM ubuntu:latest
+
+# Install sshd
+RUN apt-get update
+RUN apt-get install -y openssh-server
+
+# Modify `sshd_config`
+RUN sed -ri 's/#PermitEmptyPasswords no/PermitEmptyPasswords yes/' /etc/ssh/sshd_config
+RUN sed -ri 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed -ri 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config
+
+RUN /etc/init.d/ssh start
+
+# Delete root password (set as empty)
+RUN passwd -d root
+
+CMD ["/usr/sbin/sshd", "-D"]
